@@ -1,0 +1,11 @@
+{
+  "Profiles": [
+    {
+      "Guid": "B510D0FB-4D0B-4E7B-9F3E-9C5B7F4A1234",
+      "Name": "Dotfiles Default",
+      "Normal Font": "MesloLGSNerdFontMono-Regular 13",
+      "Non Ascii Font": "MesloLGSNerdFontMono-Regular 13",
+      "Use Non-ASCII Font": false
+    }
+  ]
+}

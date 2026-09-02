@@ -1,13 +1,36 @@
-brew "starship"
-brew "zsh-autosuggestions"
-brew "zsh-syntax-highlighting"
-brew "eza"
-brew "bat"
-brew "fzf"
-brew "zoxide"
-brew "ripgrep"
-brew "fd"
-brew "btop"
+# Brewfile — dotfiles bootstrap
+# Install everything on a new Mac with:
+#   brew bundle install --file=Brewfile
+# Update this file after installing something new with:
+#   brew bundle dump --file=Brewfile --force
+
+# --- Shell prompt ---
+brew "starship"                        # fast, cross-shell prompt (git, lang versions, etc.)
+
+# --- Zsh plugins (sourced directly in .zshrc, no framework needed) ---
+brew "zsh-autosuggestions"             # ghost-text suggestions from history
+brew "zsh-syntax-highlighting"         # colors valid/invalid commands as you type
+# --- Terminal ---
+cask "iterm2"
+# --- Neovim (kickstart-modular.nvim) ---
+brew "neovim"                          # editor itself, latest stable required
+brew "lazygit"                         # optional, kickstart's git integration plugin uses this
+
+# --- Modern CLI tool replacements ---
+brew "eza"                             # better ls (icons, git status, tree)
+brew "bat"                             # better cat (syntax highlighting)
+brew "fzf"                             # fuzzy finder (Ctrl+R history search)
+brew "zoxide"                          # smarter cd, learns your habits
+brew "ripgrep"                         # better/faster grep
+brew "fd"                              # better/faster find
+brew "btop"                            # better top/htop
+brew "tree-sitter-cli"
+# --- Terminal font (needed for Starship's icons) ---
 cask "font-meslo-lg-nerd-font"
-brew "stow"
-brew "tmux"
+
+# --- Dotfiles management ---
+brew "stow"                            # symlinks dotfiles from repo into $HOME
+
+# --- Optional ---
+brew "tmux"                            # terminal multiplexer, skip if you don't need it
+brew "gh"
