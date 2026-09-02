@@ -12,15 +12,29 @@ $character"""
 
 [directory]
 truncation_length = 3
-truncate_to_repo = true
-style = "blue bold"
+truncate_to_repo = false
+truncation_symbol = "…/"
+style = "bold cyan"
+format = "[\uf07c $path]($style) "
 
 [git_branch]
-symbol = " "
-style = "purple bold"
+symbol = "\uf418 "
+format = "[$symbol$branch]($style) "
+style = "bold purple"
 
 [git_status]
-style = "red bold"
+style = "bold red"
+format = "([$all_status$ahead_behind]($style)) "
+conflicted = "\uf071 "
+ahead = "\uf062 ${count}"
+behind = "\uf063 ${count}"
+diverged = "⇕ ${count}"
+untracked = "\uf128 ${count}"
+stashed = "\uf0c7 ${count}"
+modified = "\uf040 ${count}"
+staged = "\uf067 ${count}"
+renamed = "\uf074 ${count}"
+deleted = "\uf014 ${count}"
 
 [character]
 success_symbol = "[➜](bold green)"
@@ -31,13 +45,6 @@ min_time = 2000
 format = "took [$duration]($style) "
 
 [nodejs]
-symbol = " "
-
 [python]
-symbol = " "
-
 [rust]
-symbol = " "
-
 [golang]
-symbol = " "
