@@ -36,3 +36,5 @@ source "$BREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 eval "$(starship init zsh)"
 eval "$(zoxide init zsh)"
 source <(fzf --zsh)
+
+export GPG_TTY=$(tty)
