@@ -36,3 +36,5 @@ brew "tmux"                            # terminal multiplexer, skip if you don't
 brew "gh"
 brew "node"
 cask "claude-code"
+brew "kubectl"
+brew "mycli"

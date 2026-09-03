@@ -8,6 +8,9 @@ elif [[ -x /usr/local/bin/brew ]]; then
 fi
 BREW_PREFIX="$(brew --prefix)"
 
+# --- Completions ---
+autoload -Uz compinit && compinit
+
 # --- History ---
 HISTFILE=~/.zsh_history
 HISTSIZE=10000
@@ -28,6 +31,9 @@ alias ll="eza -la --icons --group-directories-first"
 alias lt="eza --tree --icons --level=2"
 alias cat="bat --style=plain"
 alias cc="claude"
+alias k="kubectl"
+source <(kubectl completion zsh)
+compdef k=kubectl
 
 # --- Zsh plugins (installed via brewfile, no framework needed) ---
 source "$BREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
@@ -37,5 +43,10 @@ source "$BREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 eval "$(starship init zsh)"
 eval "$(zoxide init zsh)"
 source <(fzf --zsh)
+
+# --- Tmux integration
+if [ -z "$TMUX" ] && [ -n "$PS1" ]; then
+  tmux attach -t main || tmux new -s main
+fi
 
 export GPG_TTY=$(tty)

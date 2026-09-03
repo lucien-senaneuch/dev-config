@@ -29,6 +29,7 @@ echo "==> [4/5] Symlinking configs into place..."
 ln -sf "$DOTFILES_DIR/.zshrc" "$HOME/.zshrc"
 mkdir -p "$HOME/.config"
 ln -sf "$DOTFILES_DIR/starship.toml" "$HOME/.config/starship.toml"
+ln -sf "$DOTFILES_DIR/tmux.conf" "$HOME/.tmux.conf"
 
 if [ -e "$HOME/.config/nvim" ] && [ ! -L "$HOME/.config/nvim" ]; then
   echo "    ~/.config/nvim already exists and is not a symlink — leaving it untouched."
