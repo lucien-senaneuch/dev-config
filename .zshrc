@@ -27,6 +27,7 @@ alias ls="eza --icons --group-directories-first"
 alias ll="eza -la --icons --group-directories-first"
 alias lt="eza --tree --icons --level=2"
 alias cat="bat --style=plain"
+alias cc="claude"
 
 # --- Zsh plugins (installed via brewfile, no framework needed) ---
 source "$BREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh"

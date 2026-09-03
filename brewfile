@@ -35,4 +35,4 @@ brew "stow"                            # symlinks dotfiles from repo into $HOME
 brew "tmux"                            # terminal multiplexer, skip if you don't need it
 brew "gh"
 brew "node"
-cask "dotnet-sdk"
+cask "claude-code"
