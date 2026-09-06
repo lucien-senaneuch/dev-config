@@ -49,4 +49,5 @@ if [ -z "$TMUX" ] && [ -n "$PS1" ]; then
   tmux attach -t main || tmux new -s main
 fi
 
+export DOTNET_CLI_UI_LANGUAGE=en 
 export GPG_TTY=$(tty)
