@@ -39,7 +39,14 @@ require('blink.cmp').setup {
     -- <c-k>: Toggle signature help
     --
     -- See `:help blink-cmp-config-keymap` for defining your own keymap
-    preset = 'default',
+    preset = 'enter',
+
+    -- <cr> accepts the selected item while the menu is open, otherwise it
+    -- falls through to inserting a normal newline.
+    ['<CR>'] = { 'accept', 'fallback' },
+    -- <esc> closes the menu and undoes the previewed text, staying in insert
+    -- mode. Pressing it again leaves insert mode as usual.
+    ['<Esc>'] = { 'cancel', 'fallback' },
 
     -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
     --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
