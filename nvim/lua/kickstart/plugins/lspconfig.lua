@@ -113,7 +113,31 @@ local servers = {
   --
   -- But for many setups, the LSP (`ts_ls`) will work just fine
   -- ts_ls = {},
-  roslyn_ls = {},
+  -- C# (Roslyn). Merged on top of nvim-lspconfig's `lsp/roslyn_ls.lua` defaults.
+  roslyn_ls = {
+    -- The server is a .NET app: it picks its UI culture from the OS locale, so a
+    -- `ja_JP` LANG makes it load its Japanese resources and report diagnostics in
+    -- Japanese. `DOTNET_CLI_UI_LANGUAGE` only covers the `dotnet` CLI, not this
+    -- process, so force the locale for the server (and its MSBuild BuildHost child)
+    -- without touching the locale of the rest of the shell.
+    cmd_env = {
+      LC_ALL = 'en_US.UTF-8',
+      LANG = 'en_US.UTF-8',
+      DOTNET_CLI_UI_LANGUAGE = 'en-US',
+    },
+    settings = {
+      ['csharp|completion'] = {
+        -- Auto-import: offer symbols from namespaces the file doesn't `using` yet,
+        -- and add the using directive when the completion is accepted.
+        dotnet_show_completion_items_from_unimported_namespaces = true,
+        dotnet_show_name_completion_suggestions = true,
+      },
+      ['csharp|symbol_search'] = {
+        -- Let import suggestions and search reach into reference assemblies.
+        dotnet_search_reference_assemblies = true,
+      },
+    },
+  },
   vtsls = {},
   angularls = {},
   stylua = {}, -- Used to format Lua code
