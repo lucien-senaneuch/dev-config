@@ -105,17 +105,41 @@ mkdir -p "$HOME/.config"
 ln -sf "$DOTFILES_DIR/starship.toml" "$HOME/.config/starship.toml"
 ln -sf "$DOTFILES_DIR/tmux.conf" "$HOME/.tmux.conf"
 
-if [ -e "$HOME/.config/nvim" ] && [ ! -L "$HOME/.config/nvim" ]; then
-  echo
-  echo "    *** ~/.config/nvim is a real directory, NOT a link to this repo. ***" >&2
-  echo "    Nothing here is being used by nvim: it will load that directory instead," >&2
-  echo "    which is why plugins would be missing. Back it up and re-run:" >&2
-  echo "      mv ~/.config/nvim ~/.config/nvim.bak && ./install.sh" >&2
-  echo
-else
+# ~/.config/nvim is the one link worth fussing over: if something else already
+# occupies it, nvim silently loads that instead and none of this repo applies.
+NVIM_LINK="$HOME/.config/nvim"
+WANTED_NVIM="$(cd "$DOTFILES_DIR/nvim" && pwd -P)"
+CURRENT_NVIM="$(cd "$NVIM_LINK" 2>/dev/null && pwd -P || true)"
+
+if [ ! -e "$NVIM_LINK" ] && [ ! -L "$NVIM_LINK" ]; then
+  ln -sfn "$DOTFILES_DIR/nvim" "$NVIM_LINK"
+elif [ "$CURRENT_NVIM" = "$WANTED_NVIM" ]; then
   # -n matters: without it, a re-run follows the existing symlink and creates a
   # recursive nvim/nvim link *inside* the repo instead of replacing the link.
-  ln -sfn "$DOTFILES_DIR/nvim" "$HOME/.config/nvim"
+  ln -sfn "$DOTFILES_DIR/nvim" "$NVIM_LINK"
+else
+  echo
+  echo "    ~/.config/nvim already points at ${CURRENT_NVIM:-something else}," >&2
+  echo "    not at $WANTED_NVIM." >&2
+  echo "    nvim will load THAT config, so this repo's plugins will be missing." >&2
+  REPLY_NVIM="n"
+  if [ -t 0 ]; then
+    printf "    Move it aside and link this repo instead? [y/N] "
+    read -r REPLY_NVIM || REPLY_NVIM="n"
+  fi
+  case "$REPLY_NVIM" in
+    [yY]*)
+      NVIM_BAK="$NVIM_LINK.bak-$(date +%Y%m%d%H%M%S)"
+      mv "$NVIM_LINK" "$NVIM_BAK"
+      ln -sfn "$DOTFILES_DIR/nvim" "$NVIM_LINK"
+      echo "    Moved the old config to $NVIM_BAK and linked this repo."
+      ;;
+    *)
+      echo "    Left it untouched. To switch over later:" >&2
+      echo "      mv ~/.config/nvim ~/.config/nvim.bak && ./install.sh" >&2
+      ;;
+  esac
+  echo
 fi
 
 # ---------------------------------------------------------------------------
