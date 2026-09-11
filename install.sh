@@ -106,8 +106,12 @@ ln -sf "$DOTFILES_DIR/starship.toml" "$HOME/.config/starship.toml"
 ln -sf "$DOTFILES_DIR/tmux.conf" "$HOME/.tmux.conf"
 
 if [ -e "$HOME/.config/nvim" ] && [ ! -L "$HOME/.config/nvim" ]; then
-  echo "    ~/.config/nvim already exists and is not a symlink — leaving it untouched."
-  echo "    Move or remove it, then re-run this script, if you want kickstart linked in."
+  echo
+  echo "    *** ~/.config/nvim is a real directory, NOT a link to this repo. ***" >&2
+  echo "    Nothing here is being used by nvim: it will load that directory instead," >&2
+  echo "    which is why plugins would be missing. Back it up and re-run:" >&2
+  echo "      mv ~/.config/nvim ~/.config/nvim.bak && ./install.sh" >&2
+  echo
 else
   # -n matters: without it, a re-run follows the existing symlink and creates a
   # recursive nvim/nvim link *inside* the repo instead of replacing the link.
@@ -171,6 +175,25 @@ else
     echo "      Fix: sudo apt remove neovim, then open a new shell so brew's nvim wins."
   else
     echo "    nvim v$NVIM_VER at $(command -v nvim)"
+  fi
+fi
+
+if command -v nvim &>/dev/null; then
+  # Does nvim actually load this repo? A stale ~/.config/nvim, an XDG_CONFIG_HOME
+  # override or NVIM_APPNAME all silently point it somewhere else.
+  NVIM_CFG="$(nvim --headless '+lua io.write(vim.fn.stdpath("config"))' +qa 2>/dev/null || true)"
+  if [ "$(cd "$NVIM_CFG" 2>/dev/null && pwd -P)" = "$(cd "$DOTFILES_DIR/nvim" && pwd -P)" ]; then
+    echo "    nvim loads this repo's config ($NVIM_CFG)"
+    PLUGS="$(ls -1 "$(nvim --headless '+lua io.write(vim.fn.stdpath("data"))' +qa 2>/dev/null)/site/pack/core/opt" 2>/dev/null | wc -l | tr -d ' ')"
+    if [ "${PLUGS:-0}" -lt 22 ]; then
+      echo "    NOTE: ${PLUGS:-0}/22 plugins installed — launch nvim once and let it finish."
+    else
+      echo "    $PLUGS plugins installed."
+    fi
+  else
+    echo "    WARNING: nvim reads $NVIM_CFG, which is NOT $DOTFILES_DIR/nvim." >&2
+    echo "      That is why plugins appear missing. Check ~/.config/nvim," >&2
+    echo "      \$XDG_CONFIG_HOME and \$NVIM_APPNAME." >&2
   fi
 fi
 
