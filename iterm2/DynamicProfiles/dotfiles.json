@@ -1,14 +1,15 @@
 {
-  "Profiles": [
+  "Profiles" : [
     {
-      "Guid": "B510D0FB-4D0B-4E7B-9F3E-9C5B7F4A1234",
-      "Name": "Dotfiles Default",
-      "Normal Font": "MesloLGSNFM-Regular 13",
-      "Non Ascii Font": "MesloLGSNFM-Regular 13",
-      "Use Non-ASCII Font": false,
-      "Columns": 200,
-      "Rows": 55,
-      "Mouse Reporting": true
+      "Rewritable" : true,
+      "Non Ascii Font" : "MesloLGSNFM-Regular 13",
+      "Rows" : 55,
+      "Use Non-ASCII Font" : false,
+      "Guid" : "B510D0FB-4D0B-4E7B-9F3E-9C5B7F4A1234",
+      "Name" : "Dotfiles Default",
+      "Normal Font" : "MesloLGSNFM-Regular 13",
+      "Columns" : 200,
+      "Mouse Reporting" : true
     }
   ]
 }

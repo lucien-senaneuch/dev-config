@@ -1,8 +1,12 @@
-# Brewfile — dotfiles bootstrap
-# Install everything on a new Mac with:
-#   brew bundle install --file=Brewfile
+# Brewfile — dotfiles bootstrap (macOS + Linux/WSL2)
+# Install everything on a new machine with:
+#   brew bundle install --file=brewfile
 # Update this file after installing something new with:
-#   brew bundle dump --file=Brewfile --force
+#   brew bundle dump --file=brewfile --force
+#
+# This file is Ruby, so `if OS.mac?` / `if OS.linux?` guards work. Casks and
+# fonts only exist on macOS; on WSL2 the terminal and its font live on the
+# Windows side, so those lines are skipped there.
 
 # --- Shell prompt ---
 brew "starship"                        # fast, cross-shell prompt (git, lang versions, etc.)
@@ -10,8 +14,7 @@ brew "starship"                        # fast, cross-shell prompt (git, lang ver
 # --- Zsh plugins (sourced directly in .zshrc, no framework needed) ---
 brew "zsh-autosuggestions"             # ghost-text suggestions from history
 brew "zsh-syntax-highlighting"         # colors valid/invalid commands as you type
-# --- Terminal ---
-cask "iterm2"
+
 # --- Neovim (kickstart-modular.nvim) ---
 brew "neovim"                          # editor itself, latest stable required
 brew "lazygit"                         # optional, kickstart's git integration plugin uses this
@@ -25,8 +28,6 @@ brew "ripgrep"                         # better/faster grep
 brew "fd"                              # better/faster find
 brew "btop"                            # better top/htop
 brew "tree-sitter-cli"
-# --- Terminal font (needed for Starship's icons) ---
-cask "font-meslo-lg-nerd-font"
 
 # --- Dotfiles management ---
 brew "stow"                            # symlinks dotfiles from repo into $HOME
@@ -35,6 +36,12 @@ brew "stow"                            # symlinks dotfiles from repo into $HOME
 brew "tmux"                            # terminal multiplexer, skip if you don't need it
 brew "gh"
 brew "node"
-cask "claude-code"
 brew "kubectl"
 brew "mycli"
+
+# --- macOS only ---
+if OS.mac?
+  cask "iterm2"                        # terminal (WSL2 uses Windows Terminal instead)
+  cask "font-meslo-lg-nerd-font"       # Starship's icons; on WSL2 install this font in Windows
+  cask "claude-code"                   # on Linux, install.sh installs it via npm
+end

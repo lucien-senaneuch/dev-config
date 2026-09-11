@@ -31,6 +31,29 @@ vim.o.showmode = false
 --  Schedule the setting after `UiEnter` because it can increase startup-time.
 --  Remove this option if you want your OS clipboard to remain independent.
 --  See `:help 'clipboard'`
+--  On WSL2 there is no X clipboard for Neovim to talk to, so point the provider
+--  at the Windows one. win32yank is the fast path; clip.exe + powershell is the
+--  no-install fallback (powershell costs ~200ms per paste, and emits CRLF that
+--  has to be stripped).
+if vim.fn.has 'wsl' == 1 then
+  if vim.fn.executable 'win32yank.exe' == 1 then
+    vim.g.clipboard = {
+      name = 'win32yank-wsl',
+      copy = { ['+'] = 'win32yank.exe -i --crlf', ['*'] = 'win32yank.exe -i --crlf' },
+      paste = { ['+'] = 'win32yank.exe -o --lf', ['*'] = 'win32yank.exe -o --lf' },
+      cache_enabled = 0,
+    }
+  else
+    local paste = 'powershell.exe -NoLogo -NoProfile -Command '
+      .. '[Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))'
+    vim.g.clipboard = {
+      name = 'wsl-clip.exe',
+      copy = { ['+'] = 'clip.exe', ['*'] = 'clip.exe' },
+      paste = { ['+'] = paste, ['*'] = paste },
+      cache_enabled = 0,
+    }
+  end
+end
 vim.schedule(function() vim.o.clipboard = 'unnamedplus' end)
 
 -- Enable break indent
