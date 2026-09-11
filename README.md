@@ -45,3 +45,32 @@ The script can't do these from inside WSL:
 Add it to `brewfile`, then re-run `./install.sh` (or `brew bundle install
 --file=brewfile`). Keep macOS-only apps inside the `if OS.mac?` block at the
 bottom so the Linux machine skips them.
+
+## Troubleshooting
+
+**Plugins don't load / neo-tree is missing on Linux.** Check the Neovim version
+first — this config uses `vim.pack`, which needs 0.12+:
+
+```sh
+nvim --version | head -1 && command -v nvim
+```
+
+Ubuntu's apt package is 0.9.5. On it, `init.lua` aborts with
+`E5113: Invalid 'event': 'PackChanged'` and **no** plugins load at all. Remove
+it (`sudo apt remove neovim`) so Homebrew's nvim is the one on PATH, then open a
+new shell. `./install.sh` checks this for you at the end.
+
+**`Could not get lock /var/lib/dpkg/lock-frontend`.** Something else is using
+apt — on a fresh WSL2 install that's normally `unattended-upgrades` on first
+boot. The script waits up to 10 minutes for the lock; if it still fails, see
+what holds it and retry once it's gone:
+
+```sh
+ps aux | grep -E 'apt|dpkg|unattended' | grep -v grep
+```
+
+**Tools "missing" right after install.** Homebrew's `bin` only joins `PATH`
+when `~/.zshrc` runs. Open a new shell, or `source ~/.zshrc`.
+
+**Icons show as boxes.** The Nerd Font isn't installed or isn't selected in
+Windows Terminal — see the WSL2 section above.

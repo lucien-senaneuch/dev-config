@@ -37,7 +37,7 @@ PLATFORM_LABEL="$OS"
 [ "$IS_WSL" = true ] && PLATFORM_LABEL="linux (WSL2)"
 
 STEP=0
-TOTAL=5
+TOTAL=6
 step() {
   STEP=$((STEP + 1))
   echo "==> [$STEP/$TOTAL] $1"
@@ -57,8 +57,19 @@ if [ "$OS" = macos ]; then
 else
   # Homebrew on Linux needs a compiler and a few basics; zsh itself comes from
   # apt so that chsh can point at a path already listed in /etc/shells.
-  sudo apt-get update
-  sudo apt-get install -y build-essential procps curl file git zsh unzip
+  #
+  # A fresh WSL2 Ubuntu runs unattended-upgrades in the background on first
+  # boot, which holds /var/lib/dpkg/lock-frontend. Lock::Timeout makes apt wait
+  # for it (up to 10 min) instead of failing with "Could not get lock".
+  APT_OPTS=(-o DPkg::Lock::Timeout=600)
+  if ! sudo apt-get "${APT_OPTS[@]}" update ||
+     ! sudo apt-get "${APT_OPTS[@]}" install -y build-essential procps curl file git zsh unzip; then
+    echo
+    echo "apt failed. If it was the dpkg lock, something else is mid-install —" >&2
+    echo "see what holds it, wait for it to finish, then re-run this script:" >&2
+    echo "  ps aux | grep -E 'apt|dpkg|unattended' | grep -v grep" >&2
+    exit 1
+  fi
 fi
 
 # ---------------------------------------------------------------------------
@@ -141,6 +152,38 @@ else
     echo "      in Windows Terminal, otherwise Starship's icons render as boxes:"
     echo "      https://github.com/ryanoasis/nerd-fonts/releases (Meslo.zip)"
   fi
+fi
+
+# ---------------------------------------------------------------------------
+step "Verifying the tools this config needs..."
+# The classic cross-machine failure: Ubuntu's apt ships Neovim 0.9.5, which has
+# no vim.pack, so init.lua aborts with "Invalid 'event': 'PackChanged'" and NO
+# plugins load at all (no neo-tree, no telescope). Homebrew's nvim must win.
+if ! command -v nvim &>/dev/null; then
+  echo "    WARNING: nvim is not on PATH."
+else
+  NVIM_VER="$(nvim --version | head -1 | sed -E 's/^NVIM v([0-9]+\.[0-9]+).*/\1/')"
+  NVIM_MAJOR="${NVIM_VER%%.*}"
+  NVIM_MINOR="${NVIM_VER##*.}"
+  if [ "$NVIM_MAJOR" -eq 0 ] && [ "$NVIM_MINOR" -lt 12 ]; then
+    echo "    WARNING: $(command -v nvim) is v$NVIM_VER, but this config needs 0.12+."
+    echo "      Ubuntu's apt package is 0.9.5 and will load zero plugins."
+    echo "      Fix: sudo apt remove neovim, then open a new shell so brew's nvim wins."
+  else
+    echo "    nvim v$NVIM_VER at $(command -v nvim)"
+  fi
+fi
+
+MISSING=""
+for TOOL in tmux starship eza bat fzf zoxide rg fd lazygit tree-sitter git make; do
+  command -v "$TOOL" &>/dev/null || MISSING="$MISSING $TOOL"
+done
+if [ -n "$MISSING" ]; then
+  echo "    WARNING: not found on PATH:$MISSING"
+  echo "      If you just ran this script, open a new shell and re-check —"
+  echo "      brew's bin directory only joins PATH once ~/.zshrc has run."
+else
+  echo "    All expected CLI tools are on PATH."
 fi
 
 # ---------------------------------------------------------------------------
